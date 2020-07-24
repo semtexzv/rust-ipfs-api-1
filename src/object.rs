@@ -1,7 +1,6 @@
-use IpfsApi;
+use crate::IpfsApi;
 
 use reqwest;
-use serde_json;
 use failure::Error;
 
 #[derive(Deserialize, Debug, PartialEq, Hash)]
@@ -42,17 +41,17 @@ impl ObjectStats {
 impl IpfsApi {
     /// Get stats for an IPFS hash. It can be used to get the recursive size
     /// of a hash.
-    pub fn object_stats(&self, hash: &str) -> Result<ObjectStats, Error> {
+    pub async fn object_stats(&self, hash: &str) -> Result<ObjectStats, Error> {
         let url = format!("http://{}:{}/api/v0/object/stat?arg={}", self.server, self.port, hash);
-        let resp = reqwest::get(&url)?;
-        Ok(serde_json::from_reader(resp)?)
+        let resp = reqwest::get(&url).await?.json().await?;
+        Ok(resp)
     }
 }
 
 
 #[cfg(test)]
 mod tests {
-    use IpfsApi;
+    use crate::IpfsApi;
     
     #[test]
     fn test_object_stats() {

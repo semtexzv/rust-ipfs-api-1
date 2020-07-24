@@ -1,9 +1,9 @@
-use IpfsApi;
+use crate::IpfsApi;
 
 use reqwest;
 use failure::Error;
 
-use std::io::Read;
+use bytes::Bytes;
 
 #[derive(Deserialize)]
 struct BlockPutResponse {
@@ -12,36 +12,34 @@ struct BlockPutResponse {
 }
 
 impl IpfsApi {
-    pub fn block_put<S: 'static +  Read + Send>(&self, data: S) -> Result<String, Error> {
+    pub async fn block_put<'a>(&'a self, data: Bytes) -> Result<String, Error> {
         let mut url = self.get_url()?;
         url.set_path("api/v0/block/put");
 
-        let mut res = {
-            let client = reqwest::Client::new();
-            client.post(url)
-            .multipart(reqwest::multipart::Form::new()
-                .part("arg", reqwest::multipart::Part::reader(data))
-                ).send()?
+        let res = {
+            self.client.post(url)
+                .multipart(reqwest::multipart::Form::new()
+                    .part("arg", reqwest::multipart::Part::bytes(data.to_vec()))
+                ).send().await?
         };
 
-        let json: BlockPutResponse = res.json()?;
+        let json: BlockPutResponse = res.json().await?;
         Ok(json.key)
     }
 
-    pub fn block_get(&self, hash: &str) -> Result<impl Iterator<Item=u8>, Error> {
+    pub async fn block_get(&self, hash: &str) -> Result<Bytes, Error> {
         let mut url = self.get_url()?;
         url.set_path("api/v0/block/get");
         url.query_pairs_mut()
             .append_pair("arg", hash);
 
-        let resp = reqwest::get(url)?;
-        Ok(resp.bytes().filter(|x|x.is_ok()).map(|x|x.unwrap()))
+        Ok(self.client.get(url).send().await?.bytes().await?)
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use IpfsApi;
+    use crate::IpfsApi;
 
     #[test]
     fn test_block_put() {

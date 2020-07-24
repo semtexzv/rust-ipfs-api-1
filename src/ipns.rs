@@ -1,4 +1,4 @@
-use IpfsApi;
+use crate::IpfsApi;
 
 use serde_json::Value;
 
@@ -16,11 +16,10 @@ impl IpfsApi {
     ///
     /// println!("{}", hash);
     /// ```
-    pub fn name_resolve(&self, name: &str) -> Result<String, Error> {
+    pub async fn name_resolve(&self, name: &str) -> Result<String, Error> {
         let url = format!("http://{}:{}/api/v0/name/resolve?arg={}", self.server, self.port, name);
-        let resp = reqwest::get(&url)?;
-        let resp: Value = serde_json::from_reader(resp)?;
-        
+        let resp: Value = reqwest::get(&url).await?.json().await?;
+
         if resp["Path"].is_string() {
             Ok(resp["Path"].as_str().unwrap().into())
         } else {
@@ -29,9 +28,9 @@ impl IpfsApi {
     }
 
     /// Publish an IPFS hash in IPNS.
-    pub fn name_publish(&self, hash: &str) -> Result<(), Error> {
+    pub async fn name_publish(&self, hash: &str) -> Result<(), Error> {
         let url = format!("http://{}:{}/api/v0/name/publish?arg={}", self.server, self.port, hash);
-        let _resp = reqwest::get(&url)?;
+        let _resp = reqwest::get(&url).await?;
         Ok(())
     }
 }

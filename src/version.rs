@@ -1,7 +1,6 @@
-use IpfsApi;
+use crate::IpfsApi;
 
 use reqwest;
-use serde_json;
 use failure::Error;
 
 #[derive(Deserialize, Debug)]
@@ -16,9 +15,9 @@ pub struct IpfsVersion {
 
 impl IpfsApi {
     /// Get the version from the IPFS daemon.
-    pub fn version(&self) -> Result<IpfsVersion, Error> {
+    pub async fn version(&self) -> Result<IpfsVersion, Error> {
         let url = format!("http://{}:{}/api/v0/version", self.server, self.port);
-        let resp = reqwest::get(&url)?;
-        Ok(serde_json::from_reader(resp)?)
+        let resp = reqwest::get(&url).await?.json().await?;
+        Ok(resp)
     }
 }

@@ -9,19 +9,19 @@ extern crate serde;
 extern crate failure;
 extern crate base64;
 
-mod cat;
+mod v0;
 mod ipns;
 mod object;
 pub mod pin;
 pub mod pubsub;
 mod version;
 mod shutdown;
-mod log;
 mod block;
 
 pub struct IpfsApi {
     server: String,
-    port: u16
+    port: u16,
+    client : reqwest::Client,
 }
 
 /// The main interface of the library
@@ -36,13 +36,14 @@ impl IpfsApi {
     pub fn new(server: &str, port: u16) -> IpfsApi {
         IpfsApi {
             server: server.into(),
-            port: port
+            port: port,
+            client: reqwest::Client::new(),
         }
     }
 
     /// Returns a Reqwest URL for the server
     /// Defaults to HTTP with no paths and no request parts.
-    fn get_url(&self) -> Result<reqwest::Url, reqwest::UrlError> {
+    fn get_url(&self) -> Result<reqwest::Url, url::ParseError> {
         let url_string = format!("http://{}:{}/", self.server, self.port);
         reqwest::Url::parse(&url_string)
     }

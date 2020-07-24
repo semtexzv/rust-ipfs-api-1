@@ -1,6 +1,6 @@
-use std::io::{BufReader, BufRead};
+use std::io::{BufReader, BufRead, Cursor};
 
-use IpfsApi;
+use crate::IpfsApi;
 
 use reqwest;
 use serde_json;
@@ -48,15 +48,15 @@ impl IpfsApi {
     ///     println!("{:?}", message);
     /// }
     /// ```
-    pub fn pubsub_subscribe(&self, channel: &str) -> Result<impl Iterator<Item=PubSubMessage>, Error> {
+    pub async fn pubsub_subscribe(&self, channel: &str) -> Result<impl Iterator<Item=PubSubMessage>, Error> {
         let mut url = self.get_url()?;
         url.set_path("api/v0/pubsub/sub");
         url.query_pairs_mut()
             .append_pair("arg", channel)
             .append_pair("discover", "true");
-        let resp = reqwest::get(url)?;
+        let resp = reqwest::get(url).await?.bytes().await?;
 
-        let messages = BufReader::new(resp).lines()
+        let messages = BufReader::new(Cursor::new(resp)).lines()
             .filter(|x|x.is_ok())
             .map(|x|x.unwrap())
             .map(|x|serde_json::from_str::<JsonPubSubMessage>(&x))
@@ -76,13 +76,13 @@ impl IpfsApi {
     /// Sends a p2p message to a channel
     /// This function sends a data packet to a channel/topic. It can be used
     /// for peer-to-peer communication and dynamic apps over IPFS.
-    pub fn pubsub_publish(&self, channel: &str, data: &str) -> Result<(), Error> {
+    pub async fn pubsub_publish(&self, channel: &str, data: &str) -> Result<(), Error> {
         let mut url = self.get_url()?;
         url.set_path("api/v0/pubsub/pub");
         url.query_pairs_mut()
             .append_pair("arg", channel)
             .append_pair("arg", data);
-        let _resp = reqwest::get(url)?;
+        let _resp = reqwest::get(url).await?;
         Ok(())
     }
 }

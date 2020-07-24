@@ -9,11 +9,14 @@ repository = "https://github.com/gkbrk/rust-ipfs-api"
 documentation = "https://docs.rs/ipfsapi"
 authors = ["Gökberk Yaltıraklı <webdosusb@gmail.com>"]
 readme = "README.md"
+edition = "2018"
 
 [dependencies]
-reqwest = "0.9"
+reqwest = { version = "0.10.6", features = ["json"] }
 serde = "1.0"
 serde_json = "1.0"
 serde_derive = "1.0"
-failure = "0.1"
-base64 = "0.6"
+failure = "0.1.8"
+base64 = "0.12.3"
+bytes = "0.5.6"
+url = "2.1.1"
