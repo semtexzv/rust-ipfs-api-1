@@ -19,8 +19,7 @@ mod shutdown;
 mod block;
 
 pub struct IpfsApi {
-    server: String,
-    port: u16,
+    url: url::Url,
     client : reqwest::Client,
 }
 
@@ -33,19 +32,17 @@ impl IpfsApi {
     /// ```rust,ignore
     /// let api = IpfsApi::new("127.0.0.1", 5001);
     /// ```
-    pub fn new(server: &str, port: u16) -> IpfsApi {
-        IpfsApi {
-            server: server.into(),
-            port: port,
+    pub fn new(url: &str) -> Result<IpfsApi, url::ParseError> {
+        Ok(IpfsApi {
             client: reqwest::Client::new(),
-        }
+            url: url::Url::parse(url)?,
+        })
     }
 
     /// Returns a Reqwest URL for the server
     /// Defaults to HTTP with no paths and no request parts.
     fn get_url(&self) -> Result<reqwest::Url, url::ParseError> {
-        let url_string = format!("http://{}:{}/", self.server, self.port);
-        reqwest::Url::parse(&url_string)
+        Ok(self.url.clone())
     }
 }
 

@@ -16,7 +16,7 @@ pub struct IpfsVersion {
 impl IpfsApi {
     /// Get the version from the IPFS daemon.
     pub async fn version(&self) -> Result<IpfsVersion, Error> {
-        let url = format!("http://{}:{}/api/v0/version", self.server, self.port);
+        let url = format!("{}/api/v0/version", self.url);
         let resp = reqwest::get(&url).await?.json().await?;
         Ok(resp)
     }

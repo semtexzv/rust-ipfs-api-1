@@ -8,8 +8,7 @@ struct AddResponse {
 }
 
 impl crate::IpfsApi {
-
-    pub async fn add(& self, data: Bytes) -> Result<String, Error> {
+    pub async fn add(&self, data: Bytes) -> Result<String, Error> {
         let mut url = self.get_url()?;
         url.set_path("api/v0/add");
 
@@ -52,5 +51,4 @@ impl crate::IpfsApi {
         let resp = self.client.post(url).send().await?.error_for_status()?;
         Ok(resp.bytes().await?)
     }
-
 }

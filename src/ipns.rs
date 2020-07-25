@@ -17,7 +17,7 @@ impl IpfsApi {
     /// println!("{}", hash);
     /// ```
     pub async fn name_resolve(&self, name: &str) -> Result<String, Error> {
-        let url = format!("http://{}:{}/api/v0/name/resolve?arg={}", self.server, self.port, name);
+        let url = format!("{}/api/v0/name/resolve?arg={}", self.url, name);
         let resp: Value = reqwest::get(&url).await?.json().await?;
 
         if resp["Path"].is_string() {
@@ -29,7 +29,7 @@ impl IpfsApi {
 
     /// Publish an IPFS hash in IPNS.
     pub async fn name_publish(&self, hash: &str) -> Result<(), Error> {
-        let url = format!("http://{}:{}/api/v0/name/publish?arg={}", self.server, self.port, hash);
+        let url = format!("{}/api/v0/name/publish?arg={}", self.url, hash);
         let _resp = reqwest::get(&url).await?;
         Ok(())
     }
