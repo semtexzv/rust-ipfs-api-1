@@ -1,7 +1,7 @@
 use crate::IpfsApi;
 
 use reqwest;
-use failure::Error;
+use anyhow::Error;
 
 use bytes::Bytes;
 

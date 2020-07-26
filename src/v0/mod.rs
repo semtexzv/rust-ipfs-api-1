@@ -1,5 +1,5 @@
 use bytes::Bytes;
-use failure::Error;
+use anyhow::Error;
 
 #[derive(Deserialize)]
 struct AddResponse {

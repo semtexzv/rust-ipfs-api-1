@@ -2,12 +2,8 @@
 //! This is a crate for interfacing with the local IPFS API. It allows you to
 //! read and write data to the IPFS network.
 
-extern crate reqwest;
-extern crate serde_json;
-extern crate serde;
-#[macro_use] extern crate serde_derive;
-extern crate failure;
-extern crate base64;
+#[macro_use]
+extern crate serde_derive;
 
 mod v0;
 mod ipns;

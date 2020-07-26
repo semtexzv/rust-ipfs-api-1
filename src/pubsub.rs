@@ -5,7 +5,7 @@ use crate::IpfsApi;
 use reqwest;
 use serde_json;
 use base64;
-use failure::Error;
+use anyhow::Error;
 
 #[derive(Deserialize)]
 struct JsonPubSubMessage {

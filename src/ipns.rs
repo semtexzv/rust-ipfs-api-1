@@ -4,8 +4,7 @@ use serde_json::Value;
 
 use reqwest;
 use serde_json;
-use failure::err_msg;
-use failure::Error;
+use anyhow::{Error, anyhow};
 
 impl IpfsApi {
     /// Resolve an IPNS hash or a domain name
@@ -23,7 +22,7 @@ impl IpfsApi {
         if resp["Path"].is_string() {
             Ok(resp["Path"].as_str().unwrap().into())
         } else {
-            Err(err_msg("Key error"))
+            Err(anyhow!("Key error"))
         }
     }
 

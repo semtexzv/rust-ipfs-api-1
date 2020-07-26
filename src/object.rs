@@ -1,7 +1,7 @@
 use crate::IpfsApi;
 
 use reqwest;
-use failure::Error;
+use anyhow::Error;
 
 #[derive(Deserialize, Debug, PartialEq, Hash)]
 #[serde(rename_all = "PascalCase")]

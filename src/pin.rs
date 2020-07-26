@@ -2,7 +2,7 @@ use crate::IpfsApi;
 
 use reqwest;
 use serde_json;
-use failure::{Error, err_msg};
+use anyhow::{Error, anyhow};
 
 #[derive(Deserialize, Debug, PartialEq, Hash)]
 #[serde(rename_all = "PascalCase")]
@@ -59,12 +59,12 @@ impl IpfsApi {
 
         let mut hashes = Vec::new();
 
-        let keys = resp.get("Keys").ok_or(err_msg(""))?.as_object().ok_or(err_msg(""))?;
+        let keys = resp.get("Keys").ok_or(anyhow!(""))?.as_object().ok_or(anyhow!(""))?;
 
         for (key, value) in keys.iter() {
             hashes.push(PinnedHash {
                 hash: key.clone(),
-                pin_type: match &value.get("Type").ok_or(err_msg(""))?.as_str().ok_or(err_msg(""))? {
+                pin_type: match &value.get("Type").ok_or(anyhow!(""))?.as_str().ok_or(anyhow!(""))? {
                     &"direct" => PinType::Direct,
                     &"indirect" => PinType::Indirect,
                     &"recursive" => PinType::Recursive,
